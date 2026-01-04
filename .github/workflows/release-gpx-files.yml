@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: 2026 Jasper Ben Orschulko
+# SPDX-License-Identifier: MIT
+
+name: "Release GPX files"
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 20 * * *"
+permissions:
+  contents: write
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+
+      - name: Check for TOS changes
+        run: |
+          nix develop --command make check-for-tos-changes
+
+      - id: check
+        name: Check for new map data
+        run: |
+          if nix develop --command make check-for-new-map-data; then
+            echo "exit_code=0" >> $GITHUB_OUTPUT
+          else
+            echo "exit_code=$?" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Handle check results
+        run: |
+          EXIT_CODE="${{ steps.check.outputs.exit_code }}"
+          if [ "$EXIT_CODE" != "2" ] && [ "$EXIT_CODE" != "0" ]; then
+            echo "Real error during check"
+            exit 1
+          elif [ "$EXIT_CODE" = "2" ]; then
+            echo "Map data unchanged (exit 2)"
+          else
+            echo "Map data changed (exit 0)"
+          fi
+
+      - name: Create new release (skip if unchanged)
+        if: steps.check.outputs.exit_code == 0
+        run: |
+          nix develop --command make create-github-release
