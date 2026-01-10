@@ -79,6 +79,11 @@ available on your system.
 Install a nix package manager (I recommend [lix](https://lix.systems/install/))
 and make sure you have flake support enabled.
 
+Clone this repository, in your terminal `cd` into it and run
+`nix develop --command make`.
+
+The generated GPX files will be stored in the `output` folder.
+
 ## Screenshots
 
 ### Separate GPX files
