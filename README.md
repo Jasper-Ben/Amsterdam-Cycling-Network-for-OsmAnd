@@ -84,6 +84,14 @@ Clone this repository, in your terminal `cd` into it and run
 
 The generated GPX files will be stored in the `output` folder.
 
+## Troubleshooting
+
+### OsmAnd laggy or unresponsive
+
+On some Android devices the map may become laggy or unresponsive with the
+routes enabled. Try [changing the map rendering engine](https://www.osmand.net/docs/user/personal/global-settings/#map-rendering-engine)
+from `Version 2 (OpenGL)` to `Version 1`.
+
 ## Screenshots
 
 ### Separate GPX files
